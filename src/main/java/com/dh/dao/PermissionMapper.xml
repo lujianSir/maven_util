@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.dao.PermissionDao">
+	<resultMap id="BaseResultMap" type="com.dh.entity.EBook">
+		<id column="eb_id" jdbcType="VARCHAR" property="ebId" />
+		<result column="ebc_id" jdbcType="INTEGER" property="ebcId" />
+		<result column="eb_title" jdbcType="VARCHAR" property="ebTitle" />
+		<result column="eb_img" jdbcType="VARCHAR" property="ebImg" />
+		<result column="eb_author" jdbcType="VARCHAR" property="ebAuthor" />
+		<result column="eb_indt" jdbcType="TIMESTAMP" property="ebIndt" />
+		<result column="eb_outdt" jdbcType="TIMESTAMP" property="ebOutdt" />
+		<result column="eb_status" jdbcType="INTEGER" property="ebStatus" />
+		<result column="eb_type" jdbcType="INTEGER" property="ebType" />
+		<result column="eb_fileSize" jdbcType="INTEGER" property="ebFilesize" />
+		<result column="eb_filetype" jdbcType="VARCHAR" property="ebFiletype" />
+		<result column="eb_ifEncrypt" jdbcType="INTEGER" property="ebIfencrypt" />
+		<result column="ebClosure" jdbcType="VARCHAR" property="ebclosure" />
+		<result column="eb_mp3" jdbcType="VARCHAR" property="ebMp3" />
+		<result column="eName" jdbcType="VARCHAR" property="eName" />
+		<result column="pName" jdbcType="VARCHAR" property="pName" />
+		<result column="sName" jdbcType="VARCHAR" property="sName" />
+		<result column="tName" jdbcType="VARCHAR" property="tName" />
+		<result column="eb_sort" jdbcType="INTEGER" property="ebSort" />
+		<result column="eb_autowrap" jdbcType="INTEGER" property="ebAutowrap" />
+	</resultMap>
+
+
+  <select id="queryListMenu" resultType="com.dh.entity.Tree">
+  		SELECT
+		a.m_id id,
+		a.m_pid pId,
+		a.m_name name,
+		(
+		SELECT
+			1
+		FROM
+			permission t
+		WHERE
+			t.m_id = a.m_id
+		AND t.ui_id = #{uiId}) as status from menu a ORDER BY a.m_dt
+  </select>
+  
+  <delete id="deletePermission" parameterType="java.lang.String">
+ 		delete from permission where ui_id=#{uiId}
+  </delete>
+  
+  <insert id="insertPermission" parameterType="java.util.List">
+  	insert into permission (ui_id,m_id) values
+  	<foreach collection="list" item="og" separator=","><!-- separator="," 不可以省略；item="og"是集合中每一个元素进行迭代时的别名，可以随便取。 -->
+            (#{og.uiId},#{og.mId})
+     </foreach>
+  </insert>
+  
+  
+  	<!-- 总数 -->
+	<select id="getTotal" resultType="int">
+		SELECT count(1) FROM ebook WHERE 1 = 1
+		<if test="ebTitle!=null and ebTitle !=''">
+			AND eb_title LIKE CONCAT('%',#{ebTitle},'%')
+		</if>
+	</select>
+	 <!-- EBook -->
+	<select id="getUserListPage" resultMap="BaseResultMap">
+		SELECT * FROM ebook WHERE 1 = 1
+		<if test="ebTitle!=null and ebTitle !=''">
+			AND eb_title LIKE CONCAT('%',#{ebTitle},'%')
+		</if>		
+		LIMIT #{offset},#{limit}
+	</select>
+
+</mapper>

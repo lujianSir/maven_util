@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="../css/zTreeStyle.css">
+<link rel="stylesheet" type="text/css" href="../layer/skin/layer.css">
+</head>
+<body>
+		<button  onclick="shouquan('ui8c26c5b897eb439993ec3de20438af3d')">权限管理</button>
+		<div id="Supplier_Info"  style="display:none">		 	
+			<div id="first">
+				<ul id="treeDemo" class="ztree"></ul>					
+			</div> 	
+	    </div>
+	    <input type="hidden" name="uiId" id="uiId" value="" />
+</body>
+</html>
+<script src="../js/jquery-3.1.1.min.js"></script>
+<script src="../js/jquery.ztree.all.min.js"></script>
+<script src="../layer/layer.js"></script>
+<script type="text/javascript">
+	//授权
+	var setting = {
+		 	view: {
+		 		selectedMulti: false
+	 		},
+	 		check: {
+	 			enable: true
+	        },
+	        data: {
+	            simpleData: {
+	                enable: true
+	            }
+	        },
+	    };
+
+	
+	//点击授权按钮树结构的动态加载
+	function shouquan(id){
+		$("#uiId").val(id);
+		$.ajax({
+			type: "POST",
+	 		async:true,
+	 		url: "../user/queryListMenu.do",
+			data:{"uiId":id},
+	 		dataType: "json",
+	  		success: function (data) {
+	  			var result=data;				 
+		 		var zTreeObj= $.fn.zTree.init($("#treeDemo"), setting, result);
+				var treeObj=$.fn.zTree.getZTreeObj("treeDemo");
+				var node = treeObj.getNodes();
+				//默认展开第一节
+				if (node.length>0) {
+				    for(var i=0;i<node.length;i++){
+				    	zTreeObj.expandNode(node[i], true, false, false);
+				    }
+				}
+				
+				var nodes = treeObj.transformToArray(node);
+		        for (var i = 0, l = nodes.length; i < l; i++) { 
+		          zTreeObj.checkNode(nodes[i], nodes[i].check, false); 
+		        } 
+		        layer.open({
+                    type: 1,
+                    title: '授权',
+                    shadeClose: true, //点击遮罩关闭层
+                    area : ['350px' , '450px'],
+                    content: $('#Supplier_Info'),
+                    btn: ['确定','取消'],
+                    yes: function(index, layero){
+                        //事件          
+                        user_sure(index);
+                       
+                    },
+                });
+      		} 				   		   
+		});  	
+	}
+	
+	
+	//确定按钮授权
+	function user_sure(index){
+		var uiId=$("#uiId").val();
+		var arrayTrees=onCheckforuser();
+		if(arrayTrees==""||arrayTrees==null){
+			 alert("不能为空");	
+		}else{
+			$.ajax({
+			 type: "POST",
+			 async:true,
+			 url: '../user/insertPermission.do',
+			 data:{"arrayTrees":arrayTrees.toString(),"uiId":uiId},
+			 dataType: "json",
+			  success: function (data) {
+			  	var result=	data.result;
+			  	if(result>0){
+			  		 alert("授权成功");			  		
+			  	 }else if(result==-1){
+			  		alert("授权成功,重新登录权限才可生效");
+			  	 }
+			  	else{
+			  		alert("授权失败");
+			   	 }						
+			   },	 				   		   
+			});   
+		 }
+	 }
+	
+
+	//获取树节点
+	function onCheckforuser(){
+		var  str='';
+	    var treeObj=$.fn.zTree.getZTreeObj("treeDemo");
+	    if(treeObj!=null){
+	    	var  nodes=treeObj.getCheckedNodes(true);
+	        for(var i=0;i<nodes.length;i++){
+	        		if(i!=nodes.length-1){
+	                  		str+=nodes[i].id+",";
+	                  	}else{
+	                  		str+=nodes[i].id;
+	                   } 
+	        	   /*  if(!nodes[i].isParent){ //取掉父节点
+	        	    	 if(i!=nodes.length-1){
+	                  		str+=nodes[i].id+",";
+	                  	}else{
+	                  		str+=nodes[i].id;
+	                   } 
+	        	    } */
+	        		//arr.push(nodes[i].id);
+	        }
+	        return str;
+	    }else{
+	    	 return str;
+	    }
+	 }
+	
+	/* function checkNode(e) {
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo"),
+                type = e.data.type,
+                nodes = zTree.getSelectedNodes();
+        console.log(type.indexOf("All"));
+        if (type.indexOf("All") < 0 && nodes.length == 0) {
+            alert("请先选择一个节点");
+        }
+        if (type == "checkAllTrue") {
+            zTree.checkAllNodes(true);
+            $("#checkAllTrue").hide();
+            $("#checkAllFalse").show();         
+        } else if (type == "checkAllFalse") {
+            zTree.checkAllNodes(false);
+            $("#checkAllTrue").show();
+            $("#checkAllFalse").hide();  
+        }
+    }
+    $("#checkAllTrue").bind("click", { type: "checkAllTrue" }, checkNode);
+    $("#checkAllFalse").bind("click", { type: "checkAllFalse" }, checkNode); */
+	
+
+</script>

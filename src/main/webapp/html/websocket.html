@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>WebSocket</title>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+</head>
+<body>
+    <!-- <input id="CreateSocket" type="button" value="创建WebSocKet"  onclick="creat()"/> -->
+    <input id="Message" type="text" value=""/>
+    <input id="Send" type="button" value="发送"  onclick="send()" />
+    <input id="Close" type="button" value="关闭WebSocket"  onclick="closea()"/>
+    <div id="div">
+    </div>
+</body>
+<script type="text/javascript"> 
+
+	var id=getUrlParam("id");
+	var websocaket =null;
+	if('WebSocket' in window){
+		 websocaket = new WebSocket("ws://localhost:8090/maven-utils/WebSocketTest/"+id+"");
+		}else {////用于创建 WebSocket 对象。WebSocketTest对应的是java类的注解值
+			alert("当前浏览器不支持");
+		}
+		//连接发生错误的时候回调方法；
+		websocaket.onerror=function(){
+		            alert("连接错误");
+		}
+		//连接成功时建立回调方法；
+		websocaket.onopen=function(){
+			alert("连接成功");
+		}
+		//收到消息的回调方法
+		websocaket.onmessage=function(msg){
+		 setdivInnerHTML(msg.data);
+		}
+		//连接关闭的回调方法
+		websocaket.onclose=function(){
+		 alert("关闭成功");
+		}
+	//创建连接
+	/* function creat(){		
+		if('WebSocket' in window){
+		 websocaket = new WebSocket("ws://localhost:8090/maven-utils/WebSocketTest");//用于创建 WebSocket 对象。WebSocketTest对应的是java类的注解值
+		}
+			else {
+			alert("当前浏览器不支持");
+		}
+		//连接发生错误的时候回调方法；
+		websocaket.onerror=function(){
+		            alert("连接错误");
+		}
+		//连接成功时建立回调方法；
+		websocaket.onopen=function(){
+			alert("连接成功");
+		}
+		//收到消息的回调方法
+		websocaket.onmessage=function(msg){
+		 setdivInnerHTML(msg.data);
+		}
+		//连接关闭的回调方法
+		websocaket.onclose=function(){
+		 alert("关闭成功");
+		}
+	} */
+	
+	//关闭websocket
+	//
+	function closea() {
+	 websocaket.close();
+	 alert("点击关闭");
+	}
+	function setdivInnerHTML(innerHTML) {
+	 document.getElementById('div').innerHTML += innerHTML + '<br/>';
+	}
+	function send() {
+	 var message = document.getElementById('Message').value;
+	 websocaket.send(message);//给后台发送数据
+	}
+
+	function getUrlParam(name){
+	    var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+	    var r = window.location.search.substr(1).match(reg);
+	    if (r!=null) return unescape(r[2]); return null;
+	}
+	
+</script>

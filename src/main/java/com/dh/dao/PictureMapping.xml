@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dh.dao.PictureDao">
+	<select id="queryContents" resultType="com.dh.entity.Picture">
+		select * from picture 
+	</select>
+	<insert id="insertPicByMap" parameterType="Map">
+		insert into picture(pId,pPath,pathpUrl,pUrlOne,pUrlTwo,pUrlThree) values (#{pId},#{pPath},#{pathpUrl},#{pUrlOne},#{pUrlTwo},#{pUrlThree})
+	</insert>
+	
+	<!-- 修改 -->
+ <update id="updatePic" parameterType="Map">
+ 	update picture 
+ 	<set>
+ 		<if test="pPath!=null and pPath!=''">
+ 			pPath=#{pPath},
+ 		</if>
+ 		<if test="pathpUrl!=null and pathpUrl!=''">
+ 			pathpUrl=#{pathpUrl},
+ 		</if>	
+ 		<if test="pUrlOne!=null and pUrlOne!=''">
+ 			pUrlOne=#{pUrlOne},
+ 		</if>
+ 		<if test="pUrlTwo!=null and pUrlTwo!=''">
+ 			pUrlTwo=#{pUrlTwo},
+ 		</if>
+ 		<if test="pUrlThree!=null and pUrlThree!=''">
+ 			pUrlThree=#{pUrlThree},
+ 		</if>	
+ 	</set>
+ 	where pId=#{pId} 
+ </update>
+ 
+ <delete id="deletePic" parameterType="com.dh.entity.Picture">
+ 	delete from picture where pId=#{pId}
+ </delete>
+ 
+ <select id="selectPicById" resultType="com.dh.entity.Picture">
+ 	 select * from picture where pId=#{pId} 
+ </select>
+ 
+ <select id="selectCountPic" resultType="int">
+ 	 select count(0) from picture where pId=#{id} 
+ </select>
+ 
+ 
+</mapper>

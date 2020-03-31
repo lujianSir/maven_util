@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>title</title>
+<link rel="stylesheet" type="text/css" href="../style/style.css" />
+<link rel="stylesheet" href="../kindeditor/themes/default/default.css" />
+<link rel="stylesheet" href="../kindeditor/plugins/code/prettify.css" />
+<script charset="utf-8" src="../kindeditor/kindeditor-all-min.js"></script>
+<script charset="utf-8" src="../kindeditor/lang/zh-CN.js"></script>
+<script charset="utf-8" src="../kindeditor/plugins/code/prettify.js"></script>
+<style>
+body {
+	font-size: 14px;
+	color: #000;
+	background: #fff;
+}
+</style>
+</head>
+<body>
+	<div class="mainCon">
+		<form id="createNewsForm" name="createNews" method="post"
+			enctype="multipart/form-data">
+			<table width="100%" border="0" cellspacing="0" cellpadding="0"
+				class="addTable">
+				<tr>
+					<td>产品滑动图片1</td>
+					<td><input id="pUrlOne" class="textIn1" type="file" name="file" onchange="showPreview1(this)"
+						 value="" /><img id="portrait1" src="" style="display:none; height: 50px" /></td>
+				</tr>
+				<tr>
+					<td>产品滑动图片2</td>
+					<td><input id="pUrlTwo" class="textIn1" type="file" name="file" onchange="showPreview2(this)"
+						 value="" /><img id="portrait2" src="" style="display:none; height: 50px" /></td>
+				</tr>
+				<tr>
+					<td>产品滑动图片3</td>
+					<td><input id="pUrlThree" class="textIn1" type="file" name="file" onchange="showPreview3(this)"
+						 value="" /><img id="portrait3" src="" style="display:none; height: 50px" /></td>
+				</tr>
+				<tr>
+					<td>底部漂浮图片</td>
+					<td><input id="pathpUrl" class="textIn1" type="file" name="file" onchange="showPreview(this)"
+						 value="" /><img id="portrait" src="" style="display:none; height: 50px" /></td>
+				</tr>
+				<tr>
+					<td>底部漂浮介绍 </td>
+					<td colspan="2"><textarea name="pPath" id="pPath"
+							style="width: 98%; height: 600px; visibility: hidden;"></textarea>
+					</td>
+				</tr>											
+				<tr>
+					<td>&nbsp;</td>
+					<td align="left" colspan="2"><input type="hidden" id="hId"
+						name="hId" value="" /> <input type="hidden"
+						name="currentPage" value="1" /> <input type="button"
+						class="searchBtn" onclick="dosubmit();" value="保存" /> <input
+						type="button" class="searchBtn" onclick="returnListPage();"
+						value="返回" /> <font color="red"></font></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<script src="../js/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript">
+		
+		function returnListPage() {
+			window.location.href = 'picShow.html';
+		}
+
+		var editor;
+		KindEditor.ready(function(K) {
+			window.editor = K.create('#pPath', {
+				//这里是指定的文件上传input的的属性名
+				filePostName : "uploadFile",
+				//这里就是指定文件上传的请求地址，上面也已经说了，upload_json.jsp就相当去一个servlet去进行保存文件，这个地方很重要
+				uploadJson : '..//kindeditor/upload',
+				resizeType : 1,
+				allowPreviewEmoticons : true,
+				allowImageUpload : true,
+			});
+		})
+		function dosubmit() {	
+			editor.sync();
+			html = document.getElementById('pPath').value;//原生API
+			$("#pPath").val(html);
+			var foot = $("#pPath").val();
+			var formData = new FormData();
+			//获取普通input文本内容
+			formData.append("pPath", $("#pPath").val());
+			//获取图片等文件
+			formData.append("file", $("#pathpUrl")[0].files[0],"pathpUrl");
+			formData.append("file", $("#pUrlOne")[0].files[0],"pUrlOne");	
+			formData.append("file", $("#pUrlTwo")[0].files[0],"pUrlTwo");	
+			formData.append("file", $("#pUrlThree")[0].files[0],"pUrlThree");	
+			$.ajax({
+				 url: '../pic/insertPic',  
+			        type: 'POST',  
+			        data: formData,  
+			        dataType: 'JSON',  
+			        cache: false,  
+			        processData: false,  
+			        contentType: false,
+					success : function(data) {
+					var data = data.result;
+					if (data == '1') {
+						window.location.href = 'picShow.html';
+					} else {
+						alert("添加失败");
+					}
+				}
+			});
+		}
+		function showPreview(source) {
+		      var file = source.files[0];
+		      if(window.FileReader) {
+		          var fr = new FileReader();
+		          console.log(fr);
+		          var portrait = document.getElementById('portrait');
+		          fr.onloadend = function(e) {
+		            portrait.src = e.target.result;
+		          };
+		          fr.readAsDataURL(file);
+		          portrait.style.display = 'block';
+		      }
+		 }
+		function showPreview1(source) {
+		      var file = source.files[0];
+		      if(window.FileReader) {
+		          var fr = new FileReader();
+		          console.log(fr);
+		          var portrait = document.getElementById('portrait1');
+		          fr.onloadend = function(e) {
+		            portrait.src = e.target.result;
+		          };
+		          fr.readAsDataURL(file);
+		          portrait.style.display = 'block';
+		      }
+		 }
+		function showPreview2(source) {
+		      var file = source.files[0];
+		      if(window.FileReader) {
+		          var fr = new FileReader();
+		          console.log(fr);
+		          var portrait = document.getElementById('portrait2');
+		          fr.onloadend = function(e) {
+		            portrait.src = e.target.result;
+		          };
+		          fr.readAsDataURL(file);
+		          portrait.style.display = 'block';
+		      }
+		 }
+		function showPreview3(source) {
+		      var file = source.files[0];
+		      if(window.FileReader) {
+		          var fr = new FileReader();
+		          console.log(fr);
+		          var portrait = document.getElementById('portrait3');
+		          fr.onloadend = function(e) {
+		            portrait.src = e.target.result;
+		          };
+		          fr.readAsDataURL(file);
+		          portrait.style.display = 'block';
+		      }
+		 }
+		
+	</script>
+</body>
+</html>
